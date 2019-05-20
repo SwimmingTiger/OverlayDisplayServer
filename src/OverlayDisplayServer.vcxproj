@@ -190,7 +190,8 @@
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_dx9.h" />
     <ClInclude Include="imgui_impl_win32.h" />
-    <ClInclude Include="luajit_helper.hpp" />
+    <ClInclude Include="lua_vm.hpp" />
+    <ClInclude Include="network_render.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

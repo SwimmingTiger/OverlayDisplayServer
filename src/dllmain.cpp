@@ -23,7 +23,8 @@ SOFTWARE.
 */
 
 #include "dllmain.h"
-#include "luajit_helper.hpp"
+#include "lua_vm.hpp"
+#include "network_render.hpp"
 
 //
 // Detours
@@ -62,6 +63,12 @@ namespace attrs = boost::log::attributes;
 t_WindowProc OriginalDefWindowProc = nullptr;
 t_WindowProc OriginalWindowProc = nullptr;
 PINDICIUM_ENGINE engine = nullptr;
+
+std::thread networkRenderThread;
+
+static void runNetworkRenderThread() {
+    NetworkRender::getInstance().Run(12345);
+}
 
 /**
  * \fn  BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
@@ -126,6 +133,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 			IndiciumEngineSetD3D10EventCallbacks(engine, &d3d10);
 			IndiciumEngineSetD3D11EventCallbacks(engine, &d3d11);
 
+            networkRenderThread = std::thread(runNetworkRenderThread);
+
 			//
 			// TODO: cover failure
 			//
@@ -139,6 +148,11 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 		{
 			IndiciumEngineShutdown(engine, EvtIndiciumGameUnhooked);
 			IndiciumEngineFree(engine);
+
+            NetworkRender::getInstance().Stop();
+            if (networkRenderThread.joinable()) {
+                networkRenderThread.join();
+            }
 		}
 
 		break;
@@ -626,14 +640,11 @@ LRESULT WINAPI DetourWindowProc(
 void RenderScene()
 {
 	static std::once_flag flag;
-	std::call_once(flag, []() { IndiciumEngineLogInfo("++ RenderScene called"); });
+	std::call_once(flag, []() {
+        IndiciumEngineLogInfo("++ RenderScene called");
+    });
 
-    LuaVM vm;
-    if (vm.init()) {
-        vm.SetCode("ig.Text('helloWorld')");
-        vm.RunCode();
-    }
-
+    NetworkRender::getInstance().Render();
     ImGui::Render();
 }
 
