@@ -36,12 +36,5 @@ end
 
 LogLine("Lua runtime be initializing...")
 
-local success, igLocal = pcall (require, "imgui.imgui")
-if not (success) then
-    errmsg = "load imgui.imgui failed: "..igLocal
-    LogAndSetLastError(errmsg)
-    return
-end
-
-ig = igLocal
-imgui = igLocal.lib
+ig = require("imgui.imgui")
+imgui = ig.lib

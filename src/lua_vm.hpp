@@ -94,7 +94,7 @@ public:
         code = "function " + func + "()\n" + code + "\nend";
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't load LUA code: %s") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't load LUA code: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -107,7 +107,7 @@ public:
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetLastError(string("Couldn't run LUA code: %s") + lua_tostring(stack_, -1));
+            SetLastError(string("Couldn't run LUA code: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -120,7 +120,7 @@ public:
     bool RunCodeFromFile(const string& file) {
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't load LUA file: %s") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't load LUA file: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
