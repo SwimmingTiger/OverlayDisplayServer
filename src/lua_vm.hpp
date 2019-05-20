@@ -1,14 +1,37 @@
 #pragma once
-#include <luajit/lua.hpp>
+#include <Shlwapi.h>
 #include <cassert>
 #include <string>
+#include <vector>
 #include <fstream>
 #include <Indicium/Engine/IndiciumCore.h>
+#include <boost/algorithm/string.hpp>
+#include <luajit/lua.hpp>
 
 using namespace std;
 
 constexpr char* DEFAULT_RENDER_FUNCTION = "__LuaRender__";
 constexpr char* DEFAULT_COMPUTING_FUNCTION = "__LuaComputing__";
+
+// Find DLL's parent folder path
+// From <https://stackoverflow.com/questions/6924195/get-dll-path-at-runtime/6924332>
+string thisDllDirPath()
+{
+    WCHAR path[MAX_PATH];
+    HMODULE hm;
+    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPWSTR)& thisDllDirPath, &hm))
+    {
+        GetModuleFileNameW(hm, path, sizeof(path));
+        PathRemoveFileSpecW(path);
+
+        vector<char> pathUtf8(MAX_PATH * 5, 0);
+        WideCharToMultiByte(CP_UTF8, 0, path, -1, (LPSTR)pathUtf8.data(), pathUtf8.size(), nullptr, 0);
+        return pathUtf8.data();
+    }
+    return "";
+}
 
 class LuaVM {
 protected:
@@ -42,7 +65,12 @@ public:
             ]]);
         )EOF";
 
-        initCode += "package.path = package.path .. ';C:/Users/hu60c/source/repos/OverlayDisplayServer/bin/x64/?.lua';\n";
+        string dllBaseDir = thisDllDirPath();
+        dllBaseDir = boost::replace_all_copy(dllBaseDir, "\\", "/");
+        dllBaseDir = boost::replace_all_copy(dllBaseDir, "'", "\\'");
+        IndiciumEngineLogInfo(("Lua Base Dir: " + dllBaseDir).c_str());
+
+        initCode += "package.path = package.path .. ';" + dllBaseDir + "/?.lua';\n";
         initCode += string("ThisLuaVM = ffi.new('uintptr_t', ") + std::to_string(reinterpret_cast<uintptr_t>(this)) + ");\n";
 
         if (!RunCode(std::move(initCode))) {
@@ -50,7 +78,7 @@ public:
             return false;
         }
 
-        if (!RunCodeFromFile("C:/Users/hu60c/source/repos/OverlayDisplayServer/bin/x64/imgui/init.lua")) {
+        if (!RunCodeFromFile(dllBaseDir + "/imgui/init.lua")) {
             IndiciumEngineLogInfo("Load imgui/init.lua failed");
             return false;
         }
