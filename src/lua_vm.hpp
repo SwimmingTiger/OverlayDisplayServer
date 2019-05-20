@@ -11,7 +11,6 @@
 using namespace std;
 
 constexpr char* DEFAULT_RENDER_FUNCTION = "__LuaRender__";
-constexpr char* DEFAULT_COMPUTING_FUNCTION = "__LuaComputing__";
 
 // Find DLL's parent folder path
 // From <https://stackoverflow.com/questions/6924195/get-dll-path-at-runtime/6924332>
@@ -69,12 +68,12 @@ public:
         initCode += "package.path = package.path .. ';" + dllBaseDir + "/?.lua';\n";
         initCode += string("ThisLuaVM = ffi.new('uintptr_t', ") + std::to_string(reinterpret_cast<uintptr_t>(this)) + ");\n";
 
-        if (!RunCode(std::move(initCode))) {
+        if (!ExecuteString(initCode)) {
             IndiciumEngineLogInfo("Registering LuaVM functions failed");
             return false;
         }
 
-        if (!RunCodeFromFile(dllBaseDir + "/imgui/init.lua")) {
+        if (!ExecuteFile(dllBaseDir + "/imgui/init.lua")) {
             IndiciumEngineLogInfo("Load imgui/init.lua failed");
             return false;
         }
@@ -88,39 +87,44 @@ public:
         return true;
     }
 
-    bool SetCode(string&& code, const string &func = DEFAULT_RENDER_FUNCTION) {
+    bool SetFunction(string && code, const string &functionName = DEFAULT_RENDER_FUNCTION) {
         ClearLastError();
 
-        code = "function " + func + "()\n" + code + "\nend";
+        code = "function " + functionName + "()\n" + code + "\nend";
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't load LUA code: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't set LUA function: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
     }
 
-    bool RunCode(const string& func = DEFAULT_RENDER_FUNCTION) {
-        lua_getglobal(stack_, func.c_str());
+    bool CallFunction(const string& functionName = DEFAULT_RENDER_FUNCTION) {
+        lua_getglobal(stack_, functionName.c_str());
         if (lua_type(stack_, -1) != LUA_TFUNCTION) {
             return false;
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetLastError(string("Couldn't run LUA code: ") + lua_tostring(stack_, -1));
+            SetLastError(string("Couldn't call LUA function: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
     }
 
-    bool RunCode(string&& code, const string& func = DEFAULT_RENDER_FUNCTION) {
-        return SetCode(std::move(code), func) && RunCode(func);
-    }
-
-    bool RunCodeFromFile(const string& file) {
+    bool ExecuteFile(const string& file) {
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't load LUA file: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't execute LUA file: ") + lua_tostring(stack_, -1));
+            return false;
+        }
+        return true;
+    }
+
+    bool ExecuteString(const string & code) {
+        const int status = luaL_dostring(stack_, code.c_str());
+        if (status) {
+            LogAndSetLastError(string("Couldn't execute LUA script: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;

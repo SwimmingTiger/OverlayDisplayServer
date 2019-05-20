@@ -87,7 +87,7 @@ public:
 
                     string computingScript = json["computing_script"].string_value();
                     if (!computingScript.empty()) {
-                        vm.RunCode(std::move(computingScript), DEFAULT_COMPUTING_FUNCTION);
+                        vm.ExecuteString(computingScript);
                     }
 
                     Response(hdl, id, vm.GetResponse(), vm.GetLastError());
@@ -102,7 +102,7 @@ public:
 
             string script = json["script"].string_value();
             if (!script.empty()) {
-                bool ok = vm.SetCode(std::move(script));
+                bool ok = vm.SetFunction(std::move(script));
                 if (!ok) {
                     ResponseError(hdl, id, 500, "load code failed: " + vm.GetResponse());
                     return;
@@ -239,7 +239,7 @@ public:
 
         for (auto& item : luaVMs_) {
             try {
-                item.second.RunCode();
+                item.second.CallFunction();
             }
             catch (std::exception const& e) {
                 string errmsg = (string("NetworkRender exception: ") + e.what());
