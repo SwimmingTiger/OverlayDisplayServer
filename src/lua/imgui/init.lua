@@ -20,14 +20,15 @@ end
 
 LogLine("Lua runtime be initializing...")
 
-local success, imgui = pcall (require, "imgui.imgui")
+local success, igLocal = pcall (require, "imgui.imgui")
 if not (success) then
-    errmsg = "load imgui.imgui failed: "..imgui
+    errmsg = "load imgui.imgui failed: "..igLocal
     SetResponse(errmsg)
     LogLine(errmsg)
 	error(errmsg)
     return
 end
 
-ig = imgui
+ig = igLocal
+imgui = igLocal.lib
 SetResponse("ok")
