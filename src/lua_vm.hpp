@@ -17,18 +17,14 @@ constexpr char* DEFAULT_COMPUTING_FUNCTION = "__LuaComputing__";
 // From <https://stackoverflow.com/questions/6924195/get-dll-path-at-runtime/6924332>
 string thisDllDirPath()
 {
-    WCHAR path[MAX_PATH];
+    char path[MAX_PATH * 5];
     HMODULE hm;
-    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
         GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-        (LPWSTR)& thisDllDirPath, &hm))
-    {
-        GetModuleFileNameW(hm, path, sizeof(path));
-        PathRemoveFileSpecW(path);
-
-        vector<char> pathUtf8(MAX_PATH * 5, 0);
-        WideCharToMultiByte(CP_UTF8, 0, path, -1, (LPSTR)pathUtf8.data(), pathUtf8.size(), nullptr, 0);
-        return pathUtf8.data();
+        (LPSTR)& thisDllDirPath, &hm)) {
+        GetModuleFileNameA(hm, path, sizeof(path));
+        PathRemoveFileSpecA(path);
+        return path;
     }
     return "";
 }
