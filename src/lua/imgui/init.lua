@@ -15,7 +15,23 @@ ClearResponse = function()
 end
 
 GetResponse = function()
-    return ffi.C.LuaVM_GetResponseCStr(ThisLuaVM)
+    return ffi.C.LuaVM_GetResponse(ThisLuaVM)
+end
+
+SetLastError = function(msg)
+    ffi.C.LuaVM_SetLastError(ThisLuaVM, msg)
+end
+
+LogAndSetLastError = function(msg)
+    ffi.C.LuaVM_LogAndSetLastError(ThisLuaVM, msg)
+end
+
+ClearLastError = function()
+    ffi.C.LuaVM_ClearLastError(ThisLuaVM)
+end
+
+GetLastError = function()
+    return ffi.C.LuaVM_GetLastError(ThisLuaVM)
 end
 
 LogLine("Lua runtime be initializing...")
@@ -23,12 +39,9 @@ LogLine("Lua runtime be initializing...")
 local success, igLocal = pcall (require, "imgui.imgui")
 if not (success) then
     errmsg = "load imgui.imgui failed: "..igLocal
-    SetResponse(errmsg)
-    LogLine(errmsg)
-	error(errmsg)
+    LogAndSetLastError(errmsg)
     return
 end
 
 ig = igLocal
 imgui = igLocal.lib
-SetResponse("ok")

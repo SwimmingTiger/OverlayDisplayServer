@@ -7,10 +7,14 @@
 
 using namespace std;
 
+constexpr char* DEFAULT_RENDER_FUNCTION = "__LuaRender__";
+constexpr char* DEFAULT_COMPUTING_FUNCTION = "__LuaComputing__";
+
 class LuaVM {
 protected:
     lua_State* stack_ = nullptr;
     string response_;
+    string lastError_;
 
 public:
     LuaVM() {
@@ -25,6 +29,7 @@ public:
 
     bool Init() {
         ClearResponse();
+        ClearLastError();
 
         string initCode = R"EOF(
             local ffi = require('ffi');
@@ -50,59 +55,58 @@ public:
             return false;
         }
 
-        if (GetResponse() != "ok") {
-            IndiciumEngineLogInfo("LuaVM initialized failed: %s", GetResponse());
+        if (!GetLastError().empty()) {
+            LogAndSetLastError("LuaVM initialized failed: " + GetLastError());
             return false;
         }
 
         IndiciumEngineLogInfo("LuaVM initialized successfully");
-        ClearResponse();
         return true;
     }
 
-    bool SetCode(string&& code) {
-        code = "function __LuaVMRun__()\n" + code + "\nend";
+    bool SetCode(string&& code, const string &func = DEFAULT_RENDER_FUNCTION) {
+        ClearLastError();
+
+        code = "function " + func + "()\n" + code + "\nend";
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            SetResponse(string("Couldn't load LUA code: %s") + lua_tostring(stack_, -1));
-            IndiciumEngineLogInfo(GetResponse().c_str());
+            LogAndSetLastError(string("Couldn't load LUA code: %s") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
     }
-    bool RunCode() {
-        lua_getglobal(stack_, "__LuaVMRun__");
+
+    bool RunCode(const string& func = DEFAULT_RENDER_FUNCTION) {
+        lua_getglobal(stack_, func.c_str());
         if (lua_type(stack_, -1) != LUA_TFUNCTION) {
             return false;
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetResponse(string("Couldn't run LUA code: %s") + lua_tostring(stack_, -1));
-            IndiciumEngineLogInfo(GetResponse().c_str());
+            SetLastError(string("Couldn't run LUA code: %s") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
     }
 
-    bool RunCode(string&& code) {
-        return SetCode(std::move(code)) && RunCode();
+    bool RunCode(string&& code, const string& func = DEFAULT_RENDER_FUNCTION) {
+        return SetCode(std::move(code), func) && RunCode(func);
     }
 
-    bool RunCodeFromFile(string&& file) {
+    bool RunCodeFromFile(const string& file) {
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
-            SetResponse(string("Couldn't load LUA file: %s") + lua_tostring(stack_, -1));
-            IndiciumEngineLogInfo(GetResponse().c_str());
+            LogAndSetLastError(string("Couldn't load LUA file: %s") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
     }
 
-    void AppendResponse(string&& msg) {
+    void AppendResponse(const string& msg) {
         response_ += msg;
     }
 
-    void SetResponse(string&& msg) {
+    void SetResponse(const string& msg) {
         response_ = msg;
     }
 
@@ -114,8 +118,21 @@ public:
         return response_;
     }
 
-    const char* GetResponseCStr() {
-        return response_.c_str();
+    void SetLastError(const string& msg) {
+        lastError_ = msg;
+    }
+
+    void LogAndSetLastError(const string& msg) {
+        IndiciumEngineLogInfo(msg.c_str());
+        lastError_ = msg;
+    }
+
+    void ClearLastError() {
+        lastError_.clear();
+    }
+
+    string GetLastError() {
+        return lastError_;
     }
 };
 
@@ -133,8 +150,24 @@ extern "C"
         reinterpret_cast<LuaVM*>(vm)->ClearResponse();
     }
 
-    __declspec(dllexport) const char* __cdecl LuaVM_GetResponseCStr(uintptr_t vm) {
-        return reinterpret_cast<LuaVM*>(vm)->GetResponseCStr();
+    __declspec(dllexport) const char* __cdecl LuaVM_GetResponse(uintptr_t vm) {
+        return reinterpret_cast<LuaVM*>(vm)->GetResponse().c_str();
+    }
+
+    __declspec(dllexport) void __cdecl LuaVM_SetLastError(uintptr_t vm, const char* msg) {
+        reinterpret_cast<LuaVM*>(vm)->SetLastError(msg);
+    }
+
+    __declspec(dllexport) void __cdecl LuaVM_LogAndSaveLastError(uintptr_t vm, const char* msg) {
+        reinterpret_cast<LuaVM*>(vm)->LogAndSetLastError(msg);
+    }
+
+    __declspec(dllexport) void __cdecl LuaVM_ClearLastError(uintptr_t vm) {
+        reinterpret_cast<LuaVM*>(vm)->ClearLastError();
+    }
+
+    __declspec(dllexport) const char* __cdecl LuaVM_GetLastError(uintptr_t vm) {
+        return reinterpret_cast<LuaVM*>(vm)->GetLastError().c_str();
     }
 
     __declspec(dllexport) void __cdecl LogLine(const char *msg) {

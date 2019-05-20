@@ -64,8 +64,6 @@ t_WindowProc OriginalDefWindowProc = nullptr;
 t_WindowProc OriginalWindowProc = nullptr;
 PINDICIUM_ENGINE engine = nullptr;
 
-std::thread networkRenderThread;
-
 static void runNetworkRenderThread() {
     NetworkRender::getInstance().Run(12345);
 }
@@ -133,7 +131,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 			IndiciumEngineSetD3D10EventCallbacks(engine, &d3d10);
 			IndiciumEngineSetD3D11EventCallbacks(engine, &d3d11);
 
-            networkRenderThread = std::thread(runNetworkRenderThread);
+            auto networkRenderThread = std::thread(runNetworkRenderThread);
+            networkRenderThread.detach();
 
 			//
 			// TODO: cover failure
@@ -146,13 +145,11 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 
 		if (engine)
 		{
+            IndiciumEngineLogInfo("DLL process detaching...");
+            NetworkRender::getInstance().Stop();
+
 			IndiciumEngineShutdown(engine, EvtIndiciumGameUnhooked);
 			IndiciumEngineFree(engine);
-
-            NetworkRender::getInstance().Stop();
-            if (networkRenderThread.joinable()) {
-                networkRenderThread.join();
-            }
 		}
 
 		break;
@@ -649,12 +646,10 @@ void RenderScene()
         ImGui::Render();
     }
     catch (std::exception const& e) {
-        string errmsg = (string("RenderScene exception: ") + e.what());
-        IndiciumEngineLogInfo(errmsg.c_str());
+        IndiciumEngineLogInfo((string("RenderScene exception: ") + e.what()).c_str());
     }
     catch (...) {
-        const char* errmsg = "RenderScene exception: unknown";
-        IndiciumEngineLogInfo(errmsg);
+        IndiciumEngineLogInfo("RenderScene exception: unknown");
     }
 }
 
