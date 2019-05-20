@@ -23,15 +23,16 @@ SOFTWARE.
 */
 
 #include "dllmain.h"
+#include "luajit_helper.hpp"
 
-// 
+//
 // Detours
-// 
+//
 #include <detours.h>
 
-// 
+//
 // STL
-// 
+//
 #include <mutex>
 
 //
@@ -49,9 +50,9 @@ namespace keywords = boost::log::keywords;
 namespace attrs = boost::log::attributes;
 
 
-// 
+//
 // ImGui includes
-// 
+//
 #include <imgui.h>
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_dx10.h"
@@ -81,7 +82,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 {
 	//
 	// We don't need to get notified in thread attach- or detachments
-	// 
+	//
 	DisableThreadLibraryCalls(static_cast<HMODULE>(hInstance));
 
 	INDICIUM_D3D9_EVENT_CALLBACKS d3d9;
@@ -115,19 +116,19 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 		{
 			//
 			// Get engine handle
-			// 
+			//
 			engine = IndiciumEngineAlloc();
 
 			//
 			// Register render pipeline callbacks
-			// 
+			//
 			IndiciumEngineSetD3D9EventCallbacks(engine, &d3d9);
 			IndiciumEngineSetD3D10EventCallbacks(engine, &d3d10);
 			IndiciumEngineSetD3D11EventCallbacks(engine, &d3d11);
 
-			// 
+			//
 			// TODO: cover failure
-			// 
+			//
 			err = IndiciumEngineInit(engine, EvtIndiciumGameHooked);
 		}
 
@@ -221,7 +222,7 @@ void EvtIndiciumD3D9Present(
 
 	//
 	// This section is only called once to initialize ImGui
-	// 
+	//
 	std::call_once(init, [&](LPDIRECT3DDEVICE9 pd3dDevice)
 	{
 		D3DDEVICE_CREATION_PARAMETERS params;
@@ -248,7 +249,7 @@ void EvtIndiciumD3D9Present(
 		return;
 
 	TOGGLE_STATE(VK_F12, show_overlay);
-	if (!show_overlay) 
+	if (!show_overlay)
 		return;
 
     // Start the Dear ImGui frame
@@ -292,7 +293,7 @@ void EvtIndiciumD3D9PresentEx(
 
 	//
 	// This section is only called once to initialize ImGui
-	// 
+	//
 	std::call_once(init, [&](LPDIRECT3DDEVICE9EX pd3dDevice)
 	{
 		D3DDEVICE_CREATION_PARAMETERS params;
@@ -319,7 +320,7 @@ void EvtIndiciumD3D9PresentEx(
 		return;
 
 	TOGGLE_STATE(VK_F12, show_overlay);
-	if (!show_overlay) 
+	if (!show_overlay)
 		return;
 
     // Start the Dear ImGui frame
@@ -366,7 +367,7 @@ void EvtIndiciumD3D10Present(
 
 	//
 	// This section is only called once to initialize ImGui
-	// 
+	//
 	std::call_once(init, [&](IDXGISwapChain *pChain)
 	{
 		IndiciumEngineLogInfo("Grabbing device and context pointers");
@@ -401,7 +402,7 @@ void EvtIndiciumD3D10Present(
 	if (!show_overlay)
 		return;
 
-	
+
     // Start the Dear ImGui frame
     ImGui_ImplDX10_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -455,7 +456,7 @@ void EvtIndiciumD3D11Present(
 
 	//
 	// This section is only called once to initialize ImGui
-	// 
+	//
 	std::call_once(init, [&](IDXGISwapChain *pChain)
 	{
 		IndiciumEngineLogInfo("Grabbing device and context pointers");
@@ -627,7 +628,13 @@ void RenderScene()
 	static std::once_flag flag;
 	std::call_once(flag, []() { IndiciumEngineLogInfo("++ RenderScene called"); });
 
-	ImGui::Render();
+    LuaVM vm;
+    if (vm.init()) {
+        vm.SetCode("ig.Text('helloWorld')");
+        vm.RunCode();
+    }
+
+    ImGui::Render();
 }
 
 #pragma endregion

@@ -132,7 +132,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Indicium-Supra.lib;Iphlpapi.lib;d3d9.lib;d3d10.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Indicium-Supra.lib;Iphlpapi.lib;lua51.lib;d3d9.lib;d3d10.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,6 +190,7 @@
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_dx9.h" />
     <ClInclude Include="imgui_impl_win32.h" />
+    <ClInclude Include="luajit_helper.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
