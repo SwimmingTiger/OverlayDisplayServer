@@ -644,8 +644,18 @@ void RenderScene()
         IndiciumEngineLogInfo("++ RenderScene called");
     });
 
-    NetworkRender::getInstance().Render();
-    ImGui::Render();
+    try {
+        NetworkRender::getInstance().Render();
+        ImGui::Render();
+    }
+    catch (std::exception const& e) {
+        string errmsg = (string("RenderScene exception: ") + e.what());
+        IndiciumEngineLogInfo(errmsg.c_str());
+    }
+    catch (...) {
+        const char* errmsg = "RenderScene exception: unknown";
+        IndiciumEngineLogInfo(errmsg);
+    }
 }
 
 #pragma endregion

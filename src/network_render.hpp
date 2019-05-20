@@ -210,7 +210,19 @@ public:
         lock_guard<mutex> scopeLock(luaVMLock_);
 
         for (auto& item : luaVMs_) {
-            item.second.RunCode();
+            try {
+                item.second.RunCode();
+            }
+            catch (std::exception const& e) {
+                string errmsg = (string("NetworkRender exception: ") + e.what());
+                IndiciumEngineLogInfo(errmsg.c_str());
+                item.second.SetResponse(std::move(errmsg));
+            }
+            catch (...) {
+                const char *errmsg = "NetworkRender exception: unknown";
+                IndiciumEngineLogInfo(errmsg);
+                item.second.SetResponse(errmsg);
+            }
         }
     }
 };
