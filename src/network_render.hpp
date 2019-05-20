@@ -68,15 +68,20 @@ public:
             if (itr == luaVMs_.end()) {
                 bool ok = luaVMs_[widget].Init();
                 if (!ok) {
-                    ResponseError(hdl, id, 500, "LuaVM init failed: " + luaVMs_[widget].GetResponse());
+                    ResponseError(hdl, id, 500, "LuaVM init failed: " + luaVMs_[widget].GetLastError());
                     luaVMs_.erase(widget);
                     return;
                 }
             }
 
             string command = json["command"].string_value();
+            if (command.empty()) {
+                ResponseError(hdl, id, 400, "missing field 'command'");
+                return;
+            }
+
             if (!command.empty()) {
-                if (command == "remove") {
+                if (command == "remove_widget") {
                     luaVMs_.erase(widget);
                     ResponseStatus(hdl, id, "ok");
                     return;
@@ -85,34 +90,48 @@ public:
                 if (command == "get_response") {
                     LuaVM& vm = luaVMs_[widget];
 
-                    string computingScript = json["computing_script"].string_value();
-                    if (!computingScript.empty()) {
-                        vm.ExecuteString(computingScript);
+                    string script = json["script"].string_value();
+                    if (!script.empty()) {
+                        bool ok = vm.ExecuteString(script);
+                        if (!ok) {
+                            ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastError());
+                            return;
+                        }
                     }
 
                     Response(hdl, id, vm.GetResponse(), vm.GetLastError());
                     return;
                 }
 
+                if (command == "update_view") {
+                    LuaVM& vm = luaVMs_[widget];
+
+                    string script = json["script"].string_value();
+                    bool ok = vm.ExecuteString(script);
+                    if (!ok) {
+                        ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastError());
+                        return;
+                    }
+                    ResponseStatus(hdl, id, "ok", vm.GetLastError());
+                    return;
+                }
+
+                if (command == "set_render") {
+                    LuaVM& vm = luaVMs_[widget];
+
+                    string script = json["script"].string_value();
+                    bool ok = vm.SetFunction(std::move(script));
+                    if (!ok) {
+                        ResponseError(hdl, id, 500, "set_render failed: " + vm.GetLastError());
+                        return;
+                    }
+                    ResponseStatus(hdl, id, "ok", vm.GetLastError());
+                    return;
+                }
+
                 ResponseError(hdl, id, 404, "unknown command '"+command+"'");
                 return;
             }
-
-            LuaVM& vm = luaVMs_[widget];
-
-            string script = json["script"].string_value();
-            if (!script.empty()) {
-                bool ok = vm.SetFunction(std::move(script));
-                if (!ok) {
-                    ResponseError(hdl, id, 500, "load code failed: " + vm.GetResponse());
-                    return;
-                }
-                ResponseStatus(hdl, id, "ok", vm.GetLastError());
-                return;
-            }
-
-            ResponseError(hdl, id, 400, "request should contains one of these fields: 'command' or 'script'");
-            return;
         }
         catch (websocketpp::exception const& e) {
             IndiciumEngineLogInfo((string("websocketpp exception: ") + e.what()).c_str());

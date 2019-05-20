@@ -63,7 +63,7 @@ show 0
 --------------------------------------------
 
 ```
-send 0 {"widget":"date", "script":"ig.Text(os.date('%c'))"}
+send 0 {"widget":"date", "command":"set_render", "script":"ig.Text(os.date('%c'))"}
 show 0
 ```
 
@@ -73,35 +73,49 @@ show 0
 > Remote Server: WebSocket++/0.8.1
 > Error/close reason: N/A
 > Messages Processed: (2)
->>  {"widget":"date", "script":"ig.Text(os.date('%c'))"}
+>>  {"widget":"date", "command":"set_render", "script":"ig.Text(os.date('%c'))"}
 << {"id": "", "last_error": "", "status": "ok"}
 ```
 
 --------------------------------------------
 
 ```
-send 0 {"widget":"date", "script":"ig.Begin('Time', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.Text(os.date('%c')); ig.End();"}
-send 0 {"widget":"progress", "script":"ig.SetNextWindowPos(ig.ImVec2(300, 60)); ig.Begin('Progress', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); f = os.time()%100 / 100; ig.ProgressBar(f, ig.ImVec2(0, 0)); ig.End()"}
+send 0 {"widget":"date", "command":"set_render", "script":"ig.Begin('Time', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.Text(os.date('%c')); ig.End();"}
+send 0 {"widget":"progress", "command":"set_render", "script":"ig.SetNextWindowPos(ig.ImVec2(300, 60)); ig.Begin('Progress', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); f = os.time()%100 / 100; ig.ProgressBar(f, ig.ImVec2(0, 0)); ig.End()"}
 show 0
 ```
 
 ```
->>  {"widget":"date", "script":"ig.Begin('Time', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.Text(os.date('%c')); ig.End();"}
+>>  {"widget":"date", "command":"set_render", "script":"ig.Begin('Time', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.Text(os.date('%c')); ig.End();"}
 << {"id": "", "last_error": "", "status": "ok"}
->>  {"widget":"progress", "script":"ig.SetNextWindowPos(ig.ImVec2(300, 60)); ig.Begin('Progress', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); f = os.time()%100 / 100; ig.ProgressBar(f, ig.ImVec2(0, 0)); ig.End()"}
+>>  {"widget":"progress", "command":"set_render", "script":"ig.SetNextWindowPos(ig.ImVec2(300, 60)); ig.Begin('Progress', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); f = os.time()%100 / 100; ig.ProgressBar(f, ig.ImVec2(0, 0)); ig.End()"}
 << {"id": "", "last_error": "", "status": "ok"}
 ```
 
 --------------------------------------------
 
 ```
-send 0 {"widget":"progress", "command": "get_response", "computing_script":"SetResponse('f='..tostring(f))"}
+send 0 {"widget":"progress", "command": "get_response", "script":"SetResponse('f='..tostring(f))"}
 show 0
 ```
 
 ```
->>  {"widget":"progress", "command": "get_response", "computing_script":"SetResponse('f='..tostring(f))"}
+>>  {"widget":"progress", "command": "get_response", "script":"SetResponse('f='..tostring(f))"}
 << {"id": "", "last_error": "", "response": "f=0.9"}
+```
+
+--------------------------------------------
+
+Recommended view update method:
+
+```
+send 0 {"widget":"progress2", "command":"set_render", "script":"ig.SetNextWindowPos(ig.ImVec2(500, 60)); ig.Begin('Progress2', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.ProgressBar(f or 0, ig.ImVec2(0, 0)); ig.End()"}
+send 0 {"widget":"progress2", "command": "update_view", "script":"f=0.33"}
+send 0 {"widget":"progress2", "command": "update_view", "script":"f=0.54"}
+send 0 {"widget":"progress2", "command": "update_view", "script":"f=0.66"}
+send 0 {"widget":"progress2", "command": "update_view", "script":"f=0.98"}
+send 0 {"widget":"progress2", "command": "remove_widget"}
+show 0
 ```
 
 
