@@ -65,7 +65,7 @@ t_WindowProc OriginalWindowProc = nullptr;
 PINDICIUM_ENGINE engine = nullptr;
 
 static void runNetworkRenderThread() {
-    NetworkRender::getInstance().Run(12345);
+    NetworkRender::getInstance().Run("localhost", 12345);
 }
 
 /**

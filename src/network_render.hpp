@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace json11;
+using namespace boost::asio;
 using namespace websocketpp::frame;
 
 using websocketServer = websocketpp::server<websocketpp::config::asio>;
@@ -207,7 +208,7 @@ public:
         }
     }
 
-    bool Run(uint16_t bindPort) {
+    bool Run(const string &listenHost, uint16_t listenPort) {
         try {
             // Set logging settings
             server_.set_access_channels(websocketpp::log::alevel::none);
@@ -219,8 +220,14 @@ public:
             // Register our message handler
             server_.set_message_handler(bind(&NetworkRender::OnMessage, this, ::_1, ::_2));
 
-            // Listen on port 9002
-            server_.listen(bindPort);
+            // Listen on listenHost:listenPort
+            if (listenHost == "localhost") {
+                server_.listen(ip::tcp::endpoint(ip::address::from_string("127.0.0.1"), listenPort));
+
+            }
+            else {
+                server_.listen(ip::tcp::endpoint(ip::address::from_string(listenHost), listenPort));
+            }
 
             // Start the server accept loop
             server_.start_accept();
