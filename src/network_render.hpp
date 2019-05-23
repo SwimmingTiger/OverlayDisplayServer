@@ -69,7 +69,7 @@ public:
             if (itr == luaVMs_.end()) {
                 bool ok = luaVMs_[widget].Init();
                 if (!ok) {
-                    ResponseError(hdl, id, 500, "LuaVM init failed: " + luaVMs_[widget].GetLastError());
+                    ResponseError(hdl, id, 500, "LuaVM init failed: " + luaVMs_[widget].GetLastErrorClear());
                     luaVMs_.erase(widget);
                     return;
                 }
@@ -95,12 +95,12 @@ public:
                     if (!script.empty()) {
                         bool ok = vm.ExecuteString(script);
                         if (!ok) {
-                            ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastError());
+                            ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastErrorClear());
                             return;
                         }
                     }
 
-                    Response(hdl, id, vm.GetResponse(), vm.GetLastError());
+                    Response(hdl, id, vm.GetResponse(), vm.GetLastErrorClear());
                     return;
                 }
 
@@ -110,10 +110,10 @@ public:
                     string script = json["script"].string_value();
                     bool ok = vm.ExecuteString(script);
                     if (!ok) {
-                        ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastError());
+                        ResponseError(hdl, id, 500, "execute script failed: " + vm.GetLastErrorClear());
                         return;
                     }
-                    ResponseStatus(hdl, id, "ok", vm.GetLastError());
+                    ResponseStatus(hdl, id, "ok", vm.GetLastErrorClear());
                     return;
                 }
 
@@ -123,10 +123,10 @@ public:
                     string script = json["script"].string_value();
                     bool ok = vm.SetFunction(std::move(script));
                     if (!ok) {
-                        ResponseError(hdl, id, 500, "set_render failed: " + vm.GetLastError());
+                        ResponseError(hdl, id, 500, "set_render failed: " + vm.GetLastErrorClear());
                         return;
                     }
-                    ResponseStatus(hdl, id, "ok", vm.GetLastError());
+                    ResponseStatus(hdl, id, "ok", vm.GetLastErrorClear());
                     return;
                 }
 

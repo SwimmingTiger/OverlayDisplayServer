@@ -37,7 +37,7 @@ protected:
 public:
     LuaVM() {
         stack_ = luaL_newstate();
-        assert(stack_);
+        assert(stack_, "create Lua VM failed, please restart your game or system and try again.");
         luaL_openlibs(stack_);
     }
 
@@ -93,7 +93,7 @@ public:
         code = "function " + functionName + "()\n" + code + "\nend";
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't set LUA function: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't set Lua function: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -106,7 +106,7 @@ public:
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetLastError(string("Couldn't call LUA function: ") + lua_tostring(stack_, -1));
+            SetLastError(string("Couldn't call Lua function: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -115,7 +115,7 @@ public:
     bool ExecuteFile(const string& file) {
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't execute LUA file: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't execute Lua file: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -124,7 +124,7 @@ public:
     bool ExecuteString(const string & code) {
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't execute LUA script: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError(string("Couldn't execute Lua script: ") + lua_tostring(stack_, -1));
             return false;
         }
         return true;
@@ -161,6 +161,12 @@ public:
 
     string GetLastError() {
         return lastError_;
+    }
+
+    string GetLastErrorClear() {
+        string error = lastError_;
+        lastError_.clear();
+        return error;
     }
 };
 
