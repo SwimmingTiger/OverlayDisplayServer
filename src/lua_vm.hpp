@@ -37,7 +37,10 @@ protected:
 public:
     LuaVM() {
         stack_ = luaL_newstate();
-        assert(stack_, "create Lua VM failed, please restart your game or system and try again.");
+        if (stack_ == nullptr) {
+            throw std::runtime_error("create Lua VM failed, please restart your game or system and try again.");
+        }
+
         luaL_openlibs(stack_);
     }
 
