@@ -96,7 +96,7 @@ public:
         code = "function " + functionName + "()\n" + code + "\nend";
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't set Lua function: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError("Couldn't set Lua function: " + luaLastError());
             lua_settop(stack_, 0);
             return false;
         }
@@ -112,7 +112,7 @@ public:
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetLastError(string("Couldn't call Lua function: ") + lua_tostring(stack_, -1));
+            SetLastError("Couldn't call Lua function: " + luaLastError());
             lua_settop(stack_, 0);
             return false;
         }
@@ -123,7 +123,7 @@ public:
     bool ExecuteFile(const string& file) {
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't execute Lua file: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError("Couldn't execute Lua file: " + luaLastError());
             lua_settop(stack_, 0);
             return false;
         }
@@ -134,7 +134,7 @@ public:
     bool ExecuteString(const string & code) {
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
-            LogAndSetLastError(string("Couldn't execute Lua script: ") + lua_tostring(stack_, -1));
+            LogAndSetLastError("Couldn't execute Lua script: " + luaLastError());
             lua_settop(stack_, 0);
             return false;
         }
@@ -179,6 +179,11 @@ public:
         string error = lastError_;
         lastError_.clear();
         return error;
+    }
+
+private:
+    string luaLastError() {
+        return lua_gettop(stack_) ? lua_tostring(stack_, -1) : "unknown error";
     }
 };
 
