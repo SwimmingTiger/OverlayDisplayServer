@@ -1,3 +1,6 @@
 [submodule "luajit-imgui"]
 	path = luajit-imgui
 	url = https://github.com/sonoro1234/LuaJIT-ImGui.git
+[submodule "lua-compat-5.3"]
+	path = lua-compat-5.3
+	url = https://github.com/keplerproject/lua-compat-5.3.git

@@ -1,4 +1,4 @@
-local ffi = require"ffi"
+local ffi = require("ffi")
 
 LogLine = ffi.C.LogLine
 
@@ -36,5 +36,6 @@ end
 
 LogLine("Lua runtime be initializing...")
 
+json = require("cjson")
 ig = require("imgui.imgui")
 imgui = ig.lib

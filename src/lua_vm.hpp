@@ -8,6 +8,9 @@
 #include <boost/algorithm/string.hpp>
 #include <luajit/lua.hpp>
 
+#include "../lua-cjson/lua-cjson.h"
+#include "../lua-compat-5.3/c-api/compat-5.3.h"
+
 using namespace std;
 
 constexpr char* DEFAULT_RENDER_FUNCTION = "__LuaRender__";
@@ -42,10 +45,13 @@ public:
         }
 
         luaL_openlibs(stack_);
+        luaL_requiref(stack_, "cjson", luaopen_cjson, 0);
     }
 
     ~LuaVM() {
-        lua_close(stack_);
+        if (stack_ != nullptr) {
+            lua_close(stack_);
+        }
     }
 
     bool Init() {

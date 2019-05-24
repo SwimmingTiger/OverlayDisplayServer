@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="..\luajit-imgui\cimgui\cimgui.cpp">
+      <Filter>cimgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_dx9.cpp">
+      <Filter>imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_dx10.cpp">
+      <Filter>imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_dx11.cpp">
+      <Filter>imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_win32.cpp">
+      <Filter>imgui_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lua-cjson\lua_cjson.c">
+      <Filter>lua-cjson</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lua-cjson\strbuf.c">
+      <Filter>lua-cjson</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lua-cjson\fpconv.c">
+      <Filter>lua-cjson</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lua-compat-5.3\c-api\compat-5.3.c">
+      <Filter>lua-compat-5.3</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dllmain.h" />
+    <ClInclude Include="lua_vm.hpp" />
+    <ClInclude Include="network_render.hpp" />
+    <ClInclude Include="..\luajit-imgui\cimgui\cimgui.h">
+      <Filter>cimgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx9.h">
+      <Filter>imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx10.h">
+      <Filter>imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx11.h">
+      <Filter>imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_win32.h">
+      <Filter>imgui_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lua-cjson\strbuf.h">
+      <Filter>lua-cjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lua-cjson\fpconv.h">
+      <Filter>lua-cjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lua-cjson\lua-cjson.h">
+      <Filter>lua-cjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lua-compat-5.3\c-api\compat-5.3.h">
+      <Filter>lua-compat-5.3</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="cimgui">
+      <UniqueIdentifier>{e6ed809b-75b1-440e-af32-4df71fd04a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui_impl">
+      <UniqueIdentifier>{dd940d8c-de63-4600-bd50-1844c23812b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{f771f783-498b-4c42-a765-49c6339e306c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua-cjson">
+      <UniqueIdentifier>{c6f313c0-bb04-4e16-96fe-e3ea2c2dc2ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua-compat-5.3">
+      <UniqueIdentifier>{117f2363-0d44-4df9-95be-10e252db0899}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OverlayDisplayServer.ini">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OverlayDisplayServer.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
