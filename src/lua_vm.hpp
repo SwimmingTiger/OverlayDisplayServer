@@ -97,21 +97,26 @@ public:
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
             LogAndSetLastError(string("Couldn't set Lua function: ") + lua_tostring(stack_, -1));
+            lua_settop(stack_, 0);
             return false;
         }
+        lua_settop(stack_, 0);
         return true;
     }
 
     bool CallFunction(const string& functionName = DEFAULT_RENDER_FUNCTION) {
         lua_getglobal(stack_, functionName.c_str());
         if (lua_type(stack_, -1) != LUA_TFUNCTION) {
+            lua_settop(stack_, 0);
             return false;
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
             SetLastError(string("Couldn't call Lua function: ") + lua_tostring(stack_, -1));
+            lua_settop(stack_, 0);
             return false;
         }
+        lua_settop(stack_, 0);
         return true;
     }
 
@@ -119,8 +124,10 @@ public:
         const int status = luaL_dofile(stack_, file.c_str());
         if (status) {
             LogAndSetLastError(string("Couldn't execute Lua file: ") + lua_tostring(stack_, -1));
+            lua_settop(stack_, 0);
             return false;
         }
+        lua_settop(stack_, 0);
         return true;
     }
 
@@ -128,8 +135,10 @@ public:
         const int status = luaL_dostring(stack_, code.c_str());
         if (status) {
             LogAndSetLastError(string("Couldn't execute Lua script: ") + lua_tostring(stack_, -1));
+            lua_settop(stack_, 0);
             return false;
         }
+        lua_settop(stack_, 0);
         return true;
     }
 
