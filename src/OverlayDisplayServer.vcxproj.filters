@@ -81,10 +81,25 @@
     <Filter Include="lua-compat-5.3">
       <UniqueIdentifier>{117f2363-0d44-4df9-95be-10e252db0899}</UniqueIdentifier>
     </Filter>
+    <Filter Include="res\lua">
+      <UniqueIdentifier>{7ac30f66-cf62-439b-a93b-a5a71f272187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\lua\imgui">
+      <UniqueIdentifier>{8771b28f-c3db-4cf7-970a-7be66114865f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="OverlayDisplayServer.ini">
       <Filter>res</Filter>
+    </None>
+    <None Include="lua\imgui\cdefs.lua">
+      <Filter>res\lua\imgui</Filter>
+    </None>
+    <None Include="lua\imgui\imgui.lua">
+      <Filter>res\lua\imgui</Filter>
+    </None>
+    <None Include="lua\imgui\init.lua">
+      <Filter>res\lua\imgui</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

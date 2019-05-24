@@ -100,7 +100,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\luajit-imgui\cimgui;C:\Users\hu60c\source\repos\Indicium-Supra\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\luajit-imgui\cimgui;G:\work\vcpkg\installed\x64-windows-static\include\luajit;C:\Users\hu60c\source\repos\Indicium-Supra\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)bin\$(PlatformShortName)\</OutDir>
     <LibraryPath>C:\Users\hu60c\source\repos\Indicium-Supra\bin\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -204,6 +204,9 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lua\imgui\cdefs.lua" />
+    <None Include="lua\imgui\imgui.lua" />
+    <None Include="lua\imgui\init.lua" />
     <None Include="OverlayDisplayServer.ini" />
   </ItemGroup>
   <ItemGroup>

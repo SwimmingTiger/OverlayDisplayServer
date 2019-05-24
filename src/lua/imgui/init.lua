@@ -1,5 +1,17 @@
 local ffi = require("ffi")
 
+ffi.cdef([[
+    void LuaVM_AppendResponse(uintptr_t vm, const char* msg);
+    void LuaVM_SetResponse(uintptr_t vm, const char* msg);
+    void LuaVM_ClearResponse(uintptr_t vm);
+    const char* LuaVM_GetResponse(uintptr_t vm);
+    void LuaVM_SetLastError(uintptr_t vm, const char* msg);
+    void LuaVM_LogAndSaveLastError(uintptr_t vm, const char* msg);
+    void LuaVM_ClearLastError(uintptr_t vm);
+    const char* LuaVM_GetLastError(uintptr_t vm);
+    void LogLine(const char *msg);
+]])
+
 LogLine = ffi.C.LogLine
 
 AppendResponse = function(msg)

@@ -58,24 +58,14 @@ public:
         ClearResponse();
         ClearLastError();
 
-        string initCode = R"EOF(
-            local ffi = require('ffi');
-            ffi.cdef([[
-                void LuaVM_AppendResponse(uintptr_t vm, const char* msg);
-                void LuaVM_SetResponse(uintptr_t vm, const char* msg);
-                void LuaVM_ClearResponse(uintptr_t vm);
-                const char* LuaVM_GetResponseCStr(uintptr_t vm);
-                void LogLine(const char *msg);
-            ]]);
-        )EOF";
-
         string dllBaseDir = thisDllDirPath();
         dllBaseDir = boost::replace_all_copy(dllBaseDir, "\\", "/");
         dllBaseDir = boost::replace_all_copy(dllBaseDir, "'", "\\'");
         IndiciumEngineLogInfo(("Lua Base Dir: " + dllBaseDir).c_str());
 
+        string initCode = "local ffi = require('ffi');\n";
         initCode += "package.path = package.path .. ';" + dllBaseDir + "/?.lua';\n";
-        initCode += string("ThisLuaVM = ffi.new('uintptr_t', ") + std::to_string(reinterpret_cast<uintptr_t>(this)) + ");\n";
+        initCode += "ThisLuaVM = ffi.new('uintptr_t', " + std::to_string(reinterpret_cast<uintptr_t>(this)) + ");\n";
 
         if (!ExecuteString(initCode)) {
             IndiciumEngineLogInfo("Registering LuaVM functions failed");
