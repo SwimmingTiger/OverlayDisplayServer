@@ -256,6 +256,7 @@ public:
         lock_guard<mutex> scopeLock(luaVMLock_);
 
         IndiciumEngineLogInfo("Stopping NetworkRender...");
+        luaVMs_.clear();
         server_.stop();
     }
 
