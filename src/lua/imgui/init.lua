@@ -12,7 +12,9 @@ ffi.cdef([[
     void LogLine(const char *msg);
 ]])
 
-LogLine = ffi.C.LogLine
+LogLine = function(msg)
+    ffi.C.LogLine(tostring(msg))
+end
 
 AppendResponse = function(msg)
     ffi.C.LuaVM_AppendResponse(ThisLuaVM, tostring(msg))
