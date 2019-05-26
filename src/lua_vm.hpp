@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+
+#include "imgui.h"
+#include "misc/freetype/imgui_freetype.h"
+
 #include <Indicium/Engine/IndiciumCore.h>
 #include <boost/algorithm/string.hpp>
 #include <luajit/lua.hpp>
@@ -219,5 +223,11 @@ extern "C"
 
     __declspec(dllexport) void __cdecl LogLine(const char *msg) {
         IndiciumEngineLogInfo(msg);
+    }
+
+    __declspec(dllexport) void __cdecl UpdateFontCache() {
+        ImGuiIO& io = ImGui::GetIO();
+        unsigned int flags = ImGuiFreeType::NoHinting;
+        ImGuiFreeType::BuildFontAtlas(io.Fonts, flags);
     }
 }

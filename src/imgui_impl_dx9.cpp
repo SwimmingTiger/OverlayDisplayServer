@@ -20,6 +20,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
+#include "imgui_impl_common.hpp"
 
 // DirectX
 #include <d3d9.h>
@@ -221,6 +222,7 @@ static bool ImGui_ImplDX9_CreateFontsTexture()
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
     int width, height, bytes_per_pixel;
+    LoadFonts();
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
 
     // Upload texture to graphics system

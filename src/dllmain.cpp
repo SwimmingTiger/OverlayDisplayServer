@@ -54,7 +54,7 @@ namespace attrs = boost::log::attributes;
 //
 // ImGui includes
 //
-#include <imgui.h>
+#include "imgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_dx10.h"
 #include "imgui_impl_dx11.h"
@@ -266,11 +266,11 @@ void EvtIndiciumD3D9Present(
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
+    NetworkRender::getInstance().Lock();
     ImGui::NewFrame();
-
 	RenderScene();
-
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+    NetworkRender::getInstance().Unlock();
 }
 
 void EvtIndiciumD3D9PreReset(
@@ -337,11 +337,11 @@ void EvtIndiciumD3D9PresentEx(
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
+    NetworkRender::getInstance().Lock();
     ImGui::NewFrame();
-
 	RenderScene();
-
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+    NetworkRender::getInstance().Unlock();
 }
 
 void EvtIndiciumD3D9PreResetEx(
@@ -417,11 +417,11 @@ void EvtIndiciumD3D10Present(
     // Start the Dear ImGui frame
     ImGui_ImplDX10_NewFrame();
     ImGui_ImplWin32_NewFrame();
+    NetworkRender::getInstance().Lock();
     ImGui::NewFrame();
-
 	RenderScene();
-
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
+    NetworkRender::getInstance().Unlock();
 }
 
 void EvtIndiciumD3D10PreResizeBuffers(
@@ -510,13 +510,12 @@ void EvtIndiciumD3D11Present(
     // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
+    NetworkRender::getInstance().Lock();
     ImGui::NewFrame();
-
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-
 	RenderScene();
-
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    NetworkRender::getInstance().Unlock();
 }
 
 void EvtIndiciumD3D11PreResizeBuffers(
@@ -642,7 +641,7 @@ void RenderScene()
     });
 
     try {
-        NetworkRender::getInstance().Render();
+        NetworkRender::getInstance().RenderWithoutLock();
         ImGui::Render();
     }
     catch (std::exception const& e) {

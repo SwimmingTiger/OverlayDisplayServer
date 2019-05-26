@@ -260,10 +260,16 @@ public:
         server_.stop();
     }
 
-    void Render() {
-        // Got a lock before access luaVMs_
-        lock_guard<mutex> scopeLock(luaVMLock_);
+    void Lock() {
+        luaVMLock_.lock();
+    }
 
+    void Unlock() {
+        luaVMLock_.unlock();
+    }
+
+    // Need Lock() manually
+    void RenderWithoutLock() {
         for (auto& item : luaVMs_) {
             try {
                 item.second.CallFunction();

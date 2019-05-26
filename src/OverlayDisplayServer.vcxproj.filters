@@ -29,6 +29,21 @@
     <ClCompile Include="..\lua-compat-5.3\c-api\compat-5.3.c">
       <Filter>lua-compat-5.3</Filter>
     </ClCompile>
+    <ClCompile Include="..\luajit-imgui\cimgui\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\luajit-imgui\cimgui\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\luajit-imgui\cimgui\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\luajit-imgui\cimgui\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\luajit-imgui\cimgui\imgui\misc\freetype\imgui_freetype.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.h" />
@@ -64,6 +79,30 @@
     <ClInclude Include="..\lua-compat-5.3\c-api\compat-5.3.h">
       <Filter>lua-compat-5.3</Filter>
     </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\luajit-imgui\cimgui\imgui\misc\freetype\imgui_freetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_common.hpp">
+      <Filter>imgui_impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cimgui">
@@ -86,6 +125,9 @@
     </Filter>
     <Filter Include="res\lua\imgui">
       <UniqueIdentifier>{8771b28f-c3db-4cf7-970a-7be66114865f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{7a0bc29a-5216-4e59-a347-3063fe75d525}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

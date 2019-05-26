@@ -10,11 +10,14 @@ ffi.cdef([[
     void LuaVM_ClearLastError(uintptr_t vm);
     const char* LuaVM_GetLastError(uintptr_t vm);
     void LogLine(const char *msg);
+    void UpdateFontCache();
 ]])
 
 LogLine = function(msg)
     ffi.C.LogLine(tostring(msg))
 end
+
+UpdateFontCache = ffi.C.UpdateFontCache
 
 AppendResponse = function(msg)
     ffi.C.LuaVM_AppendResponse(ThisLuaVM, tostring(msg))
