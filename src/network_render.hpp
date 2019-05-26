@@ -28,6 +28,8 @@ using websocketpp::connection_hdl;
 
 class NetworkRender {
 protected:
+    static NetworkRender *instance_;
+
     websocketServer server_;
     unordered_map<string, LuaVM> luaVMs_;
     mutex luaVMLock_;
@@ -40,8 +42,18 @@ protected:
 
 public:
     static NetworkRender& getInstance() {
-        static NetworkRender instance;
-        return instance;
+        if (instance_ == nullptr) {
+            instance_ = new NetworkRender();
+        }
+        return *instance_;
+    }
+
+    static void destoryInstance() {
+        if (instance_ != nullptr) {
+            instance_->Stop();
+            delete instance_;
+            instance_ = nullptr;
+        }
     }
 
     // Define a callback to handle incoming messages
@@ -210,9 +222,9 @@ public:
 
     bool Run(const string &listenHost, uint16_t listenPort) {
         try {
-            // Set logging settings
-            server_.set_access_channels(websocketpp::log::alevel::none);
-            server_.clear_access_channels(websocketpp::log::alevel::none);
+            // Stop logs
+            server_.clear_access_channels(websocketpp::log::alevel::all);
+            server_.clear_error_channels(websocketpp::log::elevel::all);
 
             // Initialize Asio
             server_.init_asio();
@@ -260,12 +272,8 @@ public:
         server_.stop();
     }
 
-    void Lock() {
-        luaVMLock_.lock();
-    }
-
-    void Unlock() {
-        luaVMLock_.unlock();
+    std::mutex& GetLock() {
+        return luaVMLock_;
     }
 
     // Need Lock() manually
@@ -285,3 +293,5 @@ public:
         }
     }
 };
+
+NetworkRender* NetworkRender::instance_ = nullptr;
