@@ -133,12 +133,12 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 			IndiciumEngineSetD3D10EventCallbacks(engine, &d3d10);
 			IndiciumEngineSetD3D11EventCallbacks(engine, &d3d11);
 
-            networkRenderThread = CreateThread(NULL, 0, runNetworkRenderThread, NULL, 0L, NULL);
-
 			//
 			// TODO: cover failure
 			//
 			err = IndiciumEngineInit(engine, EvtIndiciumGameHooked);
+
+            networkRenderThread = CreateThread(NULL, 0, runNetworkRenderThread, NULL, 0L, NULL);
 		}
 
 		break;
@@ -152,13 +152,13 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 			IndiciumEngineShutdown(engine, EvtIndiciumGameUnhooked);
             IndiciumEngineFree(engine);
 
-            NetworkRender::destoryInstance();
+            /*NetworkRender::destoryInstance();
 
             if (networkRenderThread != nullptr) {
                 CloseHandle(networkRenderThread);
                 networkRenderThread = nullptr;
                 IndiciumEngineLogInfo("networkRenderThread stopped");
-            }
+            }*/
         }
 
 		break;
