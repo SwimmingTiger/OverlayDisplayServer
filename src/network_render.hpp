@@ -27,35 +27,58 @@ using websocketpp::connection_hdl;
 
 
 class NetworkRender {
-protected:
+private:
     static NetworkRender *instance_;
 
     websocketServer server_;
     unordered_map<string, LuaVM> luaVMs_;
     mutex luaVMLock_;
 
-    NetworkRender() {
-    }
 
-    ~NetworkRender() {
+    // Set a instance of NetworkRender object.
+    // See InitNetworkRender() in dllmain.cpp for more details.
+    static void SetInstance(NetworkRender* instance) {
+        instance_ = instance;
     }
 
 public:
-    static NetworkRender& getInstance() {
-        if (instance_ == nullptr) {
-            instance_ = new NetworkRender();
-        }
+    static NetworkRender& GetInstance() {
         return *instance_;
     }
 
-    static void destoryInstance() {
-        if (instance_ != nullptr) {
-            instance_->Stop();
-            delete instance_;
-            instance_ = nullptr;
+    NetworkRender() {
+        SetInstance(this);
+        std::thread([this]() {
+            Run("localhost", 12345);
+        }).detach();
+    }
+
+    ~NetworkRender() {
+        Stop();
+    }
+
+    inline std::mutex& GetLock() {
+        return luaVMLock_;
+    }
+
+    // Need Lock() manually
+    void RenderWithoutLock() {
+        for (auto& item : luaVMs_) {
+            try {
+                item.second.CallFunction();
+            }
+            catch (std::exception const& e) {
+                string errmsg = (string("NetworkRender exception: ") + e.what());
+                item.second.SetLastError(errmsg);
+            }
+            catch (...) {
+                const char* errmsg = "NetworkRender exception: unknown";
+                item.second.SetLastError(errmsg);
+            }
         }
     }
 
+private:
     // Define a callback to handle incoming messages
     void OnMessage(connection_hdl hdl, message_ptr msg) {
         try {
@@ -270,27 +293,6 @@ public:
         IndiciumEngineLogInfo("Stopping NetworkRender...");
         luaVMs_.clear();
         server_.stop();
-    }
-
-    std::mutex& GetLock() {
-        return luaVMLock_;
-    }
-
-    // Need Lock() manually
-    void RenderWithoutLock() {
-        for (auto& item : luaVMs_) {
-            try {
-                item.second.CallFunction();
-            }
-            catch (std::exception const& e) {
-                string errmsg = (string("NetworkRender exception: ") + e.what());
-                item.second.SetLastError(errmsg);
-            }
-            catch (...) {
-                const char *errmsg = "NetworkRender exception: unknown";
-                item.second.SetLastError(errmsg);
-            }
-        }
     }
 };
 

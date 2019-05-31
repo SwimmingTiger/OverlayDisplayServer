@@ -36,7 +36,7 @@ string thisDllDirPath()
 }
 
 class LuaVM {
-protected:
+private:
     lua_State* stack_ = nullptr;
     string response_;
     string lastError_;

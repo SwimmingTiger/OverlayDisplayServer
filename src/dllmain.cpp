@@ -65,9 +65,13 @@ t_WindowProc OriginalWindowProc = nullptr;
 PINDICIUM_ENGINE engine = nullptr;
 HANDLE networkRenderThread = nullptr;
 
-static DWORD WINAPI runNetworkRenderThread(void* ctx) {
-    NetworkRender::getInstance().Run("localhost", 12345);
-    return 0;
+void InitNetworkRender() {
+    // Create a NetworkRender here.
+    // It will run a thread and self-register with NetworkRender::SetInstance().
+    // Run or stop a thread in DllMain() is not a good idea and may cause a deadlock,
+    // so the construction/destructor of the static object is used to avoid these drawbacks.
+    // After this call, you can get its instance using NetworkRender::GetInstance().
+    static NetworkRender g_render;
 }
 
 /**
@@ -137,8 +141,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 			// TODO: cover failure
 			//
 			err = IndiciumEngineInit(engine, EvtIndiciumGameHooked);
-
-            networkRenderThread = CreateThread(NULL, 0, runNetworkRenderThread, NULL, 0L, NULL);
 		}
 
 		break;
@@ -151,14 +153,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
             IndiciumEngineLogInfo("DLL process detaching...");
 			IndiciumEngineShutdown(engine, EvtIndiciumGameUnhooked);
             IndiciumEngineFree(engine);
-
-            /*NetworkRender::destoryInstance();
-
-            if (networkRenderThread != nullptr) {
-                CloseHandle(networkRenderThread);
-                networkRenderThread = nullptr;
-                IndiciumEngineLogInfo("networkRenderThread stopped");
-            }*/
         }
 
 		break;
@@ -261,6 +255,7 @@ void EvtIndiciumD3D9Present(
 
 		HookWindowProc(params.hFocusWindow);
 
+        InitNetworkRender();
 		initialized = true;
 
 	}, pDevice);
@@ -276,7 +271,7 @@ void EvtIndiciumD3D9Present(
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::getInstance().GetLock());
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -347,7 +342,7 @@ void EvtIndiciumD3D9PresentEx(
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::getInstance().GetLock());
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -411,6 +406,7 @@ void EvtIndiciumD3D10Present(
 
 		HookWindowProc(sd.OutputWindow);
 
+        InitNetworkRender();
 		initialized = true;
 
 	}, pSwapChain);
@@ -427,7 +423,7 @@ void EvtIndiciumD3D10Present(
     ImGui_ImplDX10_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::getInstance().GetLock());
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
@@ -507,6 +503,7 @@ void EvtIndiciumD3D11Present(
 
 		HookWindowProc(sd.OutputWindow);
 
+        InitNetworkRender();
 		initialized = true;
 
 	}, pSwapChain);
@@ -522,7 +519,7 @@ void EvtIndiciumD3D11Present(
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::getInstance().GetLock());
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	pContext->OMSetRenderTargets(1, &g_d3d11_mainRenderTargetView, NULL);
 	RenderScene();
@@ -669,7 +666,7 @@ void RenderScene()
     });
 
     try {
-        NetworkRender::getInstance().RenderWithoutLock();
+        NetworkRender::GetInstance().RenderWithoutLock();
         ImGui::Render();
     }
     catch (std::exception const& e) {
