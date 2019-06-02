@@ -116,7 +116,7 @@ public:
         }
         const int status = lua_pcall(stack_, 0, 0, 0);
         if (status) {
-            SetLastError("Couldn't call Lua function: " + luaLastError());
+            LogAndSetLastError("Couldn't call Lua function: " + luaLastError());
             lua_settop(stack_, 0);
             return false;
         }
