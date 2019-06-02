@@ -118,6 +118,13 @@ send 0 {"widget":"progress2", "command": "remove_widget"}
 show 0
 ```
 
+Load a font:
+```
+send 0 {"widget":"text", "command": "update_view", "script":"ig.GetIO().Fonts:Clear(); ig.GetIO().Fonts:AddFontFromFileTTF('C:/Windows/Fonts/simhei.ttf', 18, nil, ig.GetIO().Fonts:GetGlyphRangesChineseFull()); UpdateFontCache()"}
+send 0 {"widget":"text", "command":"set_render", "script":"ig.SetNextWindowPos(ig.ImVec2(500, 60)); ig.Begin('Text', nil, imgui.ImGuiWindowFlags_AlwaysAutoResize); ig.Text('Hello, \u4f60\u597d\u3002'); ig.End()"}
+show 0
+```
+
 
 # Build
 

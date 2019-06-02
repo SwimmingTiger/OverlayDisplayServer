@@ -268,11 +268,12 @@ void EvtIndiciumD3D9Present(
 	if (!show_overlay)
 		return;
 
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
+
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -339,11 +340,12 @@ void EvtIndiciumD3D9PresentEx(
 	if (!show_overlay)
 		return;
 
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
+
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -419,12 +421,12 @@ void EvtIndiciumD3D10Present(
 	if (!show_overlay)
 		return;
 
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
 
     // Start the Dear ImGui frame
     ImGui_ImplDX10_NewFrame();
     ImGui_ImplWin32_NewFrame();
 
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	RenderScene();
 	ImGui_ImplDX10_RenderDrawData(ImGui::GetDrawData());
@@ -516,11 +518,12 @@ void EvtIndiciumD3D11Present(
 	if (!show_overlay)
 		return;
 
+    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
+	
     // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     
-    std::lock_guard<std::mutex> scopeLock(NetworkRender::GetInstance().GetLock());
     ImGui::NewFrame();
 	pContext->OMSetRenderTargets(1, &g_d3d11_mainRenderTargetView, NULL);
 	RenderScene();

@@ -6,6 +6,10 @@
 #include <fstream>
 
 #include "imgui.h"
+#include "imgui_impl_dx9.h"
+#include "imgui_impl_dx10.h"
+#include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
 #include "misc/freetype/imgui_freetype.h"
 
 #include <Indicium/Engine/IndiciumCore.h>
@@ -227,7 +231,10 @@ extern "C"
 
     __declspec(dllexport) void __cdecl UpdateFontCache() {
         ImGuiIO& io = ImGui::GetIO();
-        unsigned int flags = ImGuiFreeType::NoHinting;
-        ImGuiFreeType::BuildFontAtlas(io.Fonts, flags);
+        ImGuiFreeType::BuildFontAtlas(io.Fonts);
+        
+        ImGui_ImplDX9_InvalidateDeviceObjects();
+        ImGui_ImplDX10_InvalidateDeviceObjects();
+        ImGui_ImplDX11_InvalidateDeviceObjects();
     }
 }

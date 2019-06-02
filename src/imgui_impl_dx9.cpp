@@ -222,7 +222,6 @@ static bool ImGui_ImplDX9_CreateFontsTexture()
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
     int width, height, bytes_per_pixel;
-    LoadFonts();
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
 
     // Upload texture to graphics system
