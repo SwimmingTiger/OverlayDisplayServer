@@ -2,6 +2,11 @@
 
 A DirectX9/10/11/12 in-game overlay with a WebSocket-based RPC that you can send Lua scripts to it to show any contents you want.
 
+## Online Game Banning Risk Notice (网络游戏封号风险警示)
+
+The project needs to inject two DLLs into the game process. The anti-cheat mechanism of online games may think that these DLLs are cheat plug-ins, which will cause your game account to be banned. If you use the project in an online game, consider the risks yourself. If such an unfortunate event really occurs, the author of the project can help you with technical explanations but without any guarantee.
+
+该项目需要向游戏内注入两个DLL。网络游戏的反作弊机制可能会认为这些DLL是作弊外挂，从而导致你的游戏账号被封。如果你想在网络游戏中使用该项目，请自行考虑其风险。如果真的不幸被封号，该项目的作者可以帮你提供一些技术方面的解释，但是不做任何关于解封方面的保证。
 
 ## The initial development
 
